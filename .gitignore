@@ -1,0 +1,17 @@
+# dependencies
+node_modules/
+
+# build output
+dist/
+
+# secrets — never commit
+.env
+.env.*
+*.env
+secrets.*
+credentials.*
+
+# misc
+.DS_Store
+*.log
+ruvector.db
