@@ -224,3 +224,38 @@ input:-webkit-autofill:focus {
   background: var(--bg-base);
   overflow-y: auto;
 }
+
+/* ── MOBILE (≤639px) ── */
+@media (max-width: 639px) {
+  :root {
+    /* Menu panel nearly full-width on phones so it never leaves a sliver */
+    --panel-width: min(88vw, 340px);
+  }
+
+  /* Logo pill sits on the left instead of centered, so it never collides
+     with the fixed MENU toggle on the right. */
+  .navbar-pill {
+    left: 12px;
+    transform: none;
+    max-width: calc(100vw - 128px);
+    padding: 0;
+  }
+  .navbar-pill.scrolled { transform: none; }
+
+  /* With Enquire hidden on mobile the logo is the only child — drop the divider */
+  .navbar-logo {
+    border-right: none !important;
+    padding: 0 16px !important;
+  }
+
+  .menu-toggle {
+    right: 12px;
+    padding: 0 16px;
+    gap: 0.45rem;
+  }
+}
+
+@media (max-width: 380px) {
+  .menu-toggle { padding: 0 13px; }
+  .navbar-pill { max-width: calc(100vw - 116px); }
+}

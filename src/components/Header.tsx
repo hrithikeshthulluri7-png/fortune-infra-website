@@ -38,6 +38,7 @@ export default function Header({ menuOpen, onAboutOpen, onContactOpen }: Props) 
       {/* Logo — home button */}
       <div
         onClick={() => smoothScrollTop()}
+        className="navbar-logo"
         style={{
           borderRight: '1px solid rgba(255,255,255,0.07)',
           padding: '0 20px 0 14px',
@@ -58,8 +59,9 @@ export default function Header({ menuOpen, onAboutOpen, onContactOpen }: Props) 
         </span>
       </div>
 
-      {/* Nav links — hidden on mobile */}
-      <div style={{ display: 'flex', alignItems: 'center' }} className="hidden sm:flex">
+      {/* Nav links — hidden on mobile (inline display omitted so the
+          Tailwind `hidden` class can win; sm:flex restores it on desktop) */}
+      <div style={{ alignItems: 'center' }} className="hidden sm:flex">
         {NAV_LINKS.map(link => (
           <a
             key={link.action}
@@ -84,8 +86,8 @@ export default function Header({ menuOpen, onAboutOpen, onContactOpen }: Props) 
         ))}
       </div>
 
-      {/* Enquire Now button */}
-      <div style={{ padding: '0 6px' }}>
+      {/* Enquire Now button — hidden on mobile (MENU covers contact) */}
+      <div style={{ padding: '0 6px' }} className="hidden sm:block">
         <button
           onClick={onContactOpen}
           onMouseEnter={() => setEnquireHovered(true)}

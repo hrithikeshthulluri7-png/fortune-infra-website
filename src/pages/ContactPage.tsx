@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'motion/react'
 
 interface Props {
@@ -8,6 +8,14 @@ interface Props {
 
 export default function ContactPage({ isOpen, onClose }: Props) {
   const [hoveredMethod, setHoveredMethod] = useState<null | 'call' | 'email'>(null)
+  // Flip `shown` one frame after open so the animate value changes and the
+  // slide-in actually fires (mount-time initial→animate does not animate here).
+  const [shown, setShown] = useState(false)
+  useEffect(() => {
+    if (!isOpen) { setShown(false); return }
+    const id = setTimeout(() => setShown(true), 40)
+    return () => clearTimeout(id)
+  }, [isOpen])
 
   return (
     <AnimatePresence>
@@ -15,7 +23,7 @@ export default function ContactPage({ isOpen, onClose }: Props) {
         <motion.div
           className="page-overlay"
           initial={{ y: '100%' }}
-          animate={{ y: '0%' }}
+          animate={{ y: shown ? '0%' : '100%' }}
           exit={{ y: '100%' }}
           transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
           style={{ display: 'flex', flexDirection: 'column', height: '100vh' }}

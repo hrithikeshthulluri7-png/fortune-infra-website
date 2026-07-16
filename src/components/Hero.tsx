@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { motion, AnimatePresence } from 'motion/react'
+import { motion } from 'motion/react'
 import { smoothScrollToElement } from '../utils/smoothScroll'
 
 interface Props {
@@ -27,23 +27,23 @@ const slides = [
   },
 ]
 
-const containerVariants = {
-  hidden: {},
-  visible: { transition: { staggerChildren: 0.1 } },
-}
+const EASE = [0.22, 1, 0.36, 1] as [number, number, number, number]
 
-const textVariants = {
-  hidden: { opacity: 0, y: 50, filter: 'blur(6px)' },
-  visible: {
-    opacity: 1,
-    y: 0,
-    filter: 'blur(0px)',
-    transition: { duration: 1.1, ease: [0.22, 1, 0.36, 1] as [number, number, number, number] },
+// Controlled entrance: animate is bound to `revealed` (which flips per slide),
+// matching the pattern used across the rest of the site. Mount-based
+// initial→animate did not fire reliably for these nested elements.
+const fadeUp = (revealed: boolean, delay: number) => ({
+  animate: {
+    opacity: revealed ? 1 : 0,
+    y: revealed ? 0 : 50,
+    filter: revealed ? 'blur(0px)' : 'blur(6px)',
   },
-}
+  transition: { duration: 1.1, ease: EASE, delay },
+})
 
 export default function Hero({ menuOpen: _menuOpen }: Props) {
   const [activeSlide, setActiveSlide] = useState(0)
+  const [revealed, setRevealed] = useState(false)
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -51,6 +51,13 @@ export default function Hero({ menuOpen: _menuOpen }: Props) {
     }, 6000)
     return () => clearInterval(timer)
   }, [])
+
+  // Re-trigger the text entrance whenever the slide changes.
+  useEffect(() => {
+    setRevealed(false)
+    const t = setTimeout(() => setRevealed(true), 60)
+    return () => clearTimeout(t)
+  }, [activeSlide])
 
   return (
     <>
@@ -102,25 +109,21 @@ export default function Hero({ menuOpen: _menuOpen }: Props) {
 
       {/* Hero text block */}
       <div style={{ position: 'fixed', inset: 0, zIndex: 20, pointerEvents: 'none' }}>
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={activeSlide}
-            variants={containerVariants}
-            initial="hidden"
-            animate="visible"
+          <div
             style={{
               position: 'absolute',
               bottom: '14vh',
               left: 'clamp(24px, 6vw, 96px)',
+              right: 'clamp(24px, 6vw, 96px)',
               display: 'flex',
               flexDirection: 'column',
               alignItems: 'flex-start',
-              maxWidth: 'clamp(360px, 52vw, 700px)',
+              maxWidth: 'clamp(320px, 52vw, 700px)',
             }}
           >
             {/* Eyebrow */}
             <motion.div
-              variants={textVariants}
+              {...fadeUp(revealed, 0)}
               style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '20px' }}
             >
               <div style={{ width: '24px', height: '1px', background: 'var(--accent)' }} />
@@ -132,9 +135,9 @@ export default function Hero({ menuOpen: _menuOpen }: Props) {
             {/* Headline line 1 */}
             <div style={{ overflow: 'hidden' }}>
               <motion.div
-                variants={textVariants}
+                {...fadeUp(revealed, 0.1)}
                 style={{
-                  fontSize: 'clamp(56px, 10.5vw, 148px)',
+                  fontSize: 'clamp(44px, 10.5vw, 148px)',
                   fontWeight: 700,
                   lineHeight: 0.88,
                   letterSpacing: '-0.02em',
@@ -151,9 +154,9 @@ export default function Hero({ menuOpen: _menuOpen }: Props) {
             {/* Headline line 2 */}
             <div style={{ overflow: 'hidden' }}>
               <motion.div
-                variants={textVariants}
+                {...fadeUp(revealed, 0.2)}
                 style={{
-                  fontSize: 'clamp(56px, 10.5vw, 148px)',
+                  fontSize: 'clamp(44px, 10.5vw, 148px)',
                   fontWeight: 700,
                   lineHeight: 0.88,
                   letterSpacing: '-0.02em',
@@ -169,7 +172,7 @@ export default function Hero({ menuOpen: _menuOpen }: Props) {
 
             {/* Subtext */}
             <motion.div
-              variants={textVariants}
+              {...fadeUp(revealed, 0.3)}
               style={{
                 marginTop: '24px',
                 fontSize: 'clamp(11px, 1.1vw, 14px)',
@@ -187,8 +190,8 @@ export default function Hero({ menuOpen: _menuOpen }: Props) {
 
             {/* Buttons */}
             <motion.div
-              variants={textVariants}
-              style={{ marginTop: '32px', display: 'flex', gap: '12px', pointerEvents: 'auto' }}
+              {...fadeUp(revealed, 0.4)}
+              style={{ marginTop: '32px', display: 'flex', gap: '12px', pointerEvents: 'auto', flexWrap: 'wrap' }}
             >
               <button
                 onClick={() => smoothScrollToElement('services')}
@@ -229,8 +232,7 @@ export default function Hero({ menuOpen: _menuOpen }: Props) {
                 ENQUIRE NOW
               </a>
             </motion.div>
-          </motion.div>
-        </AnimatePresence>
+          </div>
       </div>
 
       {/* Slide indicators */}

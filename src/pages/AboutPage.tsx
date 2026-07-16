@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'motion/react'
 
 interface Props {
@@ -12,14 +13,24 @@ const stats = [
 ]
 
 export default function AboutPage({ isOpen, onClose }: Props) {
+  // In this motion setup a mount-time initial→animate does not fire; only a
+  // CHANGE in the animate value triggers the transition. So we flip `shown`
+  // one frame after open to drive the slide-in.
+  const [shown, setShown] = useState(false)
+  useEffect(() => {
+    if (!isOpen) { setShown(false); return }
+    const id = setTimeout(() => setShown(true), 40)
+    return () => clearTimeout(id)
+  }, [isOpen])
+
   return (
     <AnimatePresence>
       {isOpen && (
         <motion.div
           className="page-overlay"
-          initial={{ x: '100%' }}
-          animate={{ x: '0%' }}
-          exit={{ x: '100%' }}
+          initial={{ y: '100%' }}
+          animate={{ y: shown ? '0%' : '100%' }}
+          exit={{ y: '100%' }}
           transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
         >
           {/* Close button */}

@@ -15,3 +15,7 @@ credentials.*
 .DS_Store
 *.log
 ruvector.db
+
+# build info
+tsconfig.tsbuildinfo
+dist/
