@@ -1,5 +1,6 @@
 import { useState, useRef } from 'react'
 import { motion, useInView } from 'motion/react'
+import AvailabilityGrid from './AvailabilityGrid'
 
 const plans = [
   {
@@ -91,6 +92,7 @@ function RoomItem({ room, delay }: { room: { label: string; area: string }; dela
 
 export default function FloorPlans() {
   const [activeTab, setActiveTab] = useState('premier')
+  const [showAvailability, setShowAvailability] = useState(false)
   const activePlan = plans.find(p => p.id === activeTab)!
   const headerRef = useRef<HTMLDivElement>(null)
   const headerInView = useInView(headerRef, { once: true, margin: '-80px' })
@@ -247,9 +249,36 @@ export default function FloorPlans() {
             >
               ENQUIRE ABOUT THIS PROJECT
             </a>
+            <button
+              onClick={() => setShowAvailability(v => !v)}
+              style={{
+                border: showAvailability ? '1px solid var(--accent)' : '1px solid rgba(255,255,255,0.15)',
+                padding: '12px 24px',
+                fontSize: '9px',
+                letterSpacing: '0.2em',
+                color: showAvailability ? 'var(--accent)' : 'var(--text-secondary)',
+                background: 'transparent',
+                cursor: 'pointer',
+                fontFamily: 'inherit',
+                textTransform: 'uppercase',
+                borderRadius: '2px',
+                display: 'inline-block',
+              }}
+            >
+              {showAvailability ? 'HIDE AVAILABILITY' : 'SEE AVAILABILITY'}
+            </button>
           </div>
         </div>
       </div>
+
+      {/* Unit availability heatmap */}
+      {showAvailability && (
+        <AvailabilityGrid
+          key={activeTab}
+          planId={activeTab}
+          planName={activePlan.name.toUpperCase()}
+        />
+      )}
     </section>
   )
 }
